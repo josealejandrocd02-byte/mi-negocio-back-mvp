@@ -35,6 +35,31 @@ public class Product {
  @CreationTimestamp
  @Column(name = "created_at", nullable = false, updatable = false)
  private Instant createdAt;
+ 
+ @Column(name = "image_url")
+ private String imageUrl;
+
+ @Column(name = "image_public_id")
+ private String imagePublicId;
+ 
+ 
+ 
+
+ public String getImageUrl() {
+	return imageUrl;
+}
+
+ public void setImageUrl(String imageUrl) {
+	this.imageUrl = imageUrl;
+ }
+
+ public String getImagePublicId() {
+	return imagePublicId;
+ }
+
+ public void setImagePublicId(String imagePublicId) {
+	this.imagePublicId = imagePublicId;
+ }
 
  public UUID getId() {
 	return id;
