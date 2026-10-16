@@ -29,6 +29,28 @@ public class Store {
  @Enumerated(EnumType.STRING)
  @Column(nullable = false, length = 20)
  private StoreStatus status = StoreStatus.ACTIVE;
+ 
+ @Column(name = "logo_url")
+ private String logoUrl;
+
+ @Column(name = "logo_public_id")
+ private String logoPublicId;
+
+ public String getLogoUrl() {
+	return logoUrl;
+}
+
+ public void setLogoUrl(String logoUrl) {
+	this.logoUrl = logoUrl;
+ }
+
+ public String getLogoPublicId() {
+	return logoPublicId;
+ }
+
+ public void setLogoPublicId(String logoPublicId) {
+	this.logoPublicId = logoPublicId;
+ }
 
  @CreationTimestamp
  @Column(name = "created_at", nullable = false, updatable = false)
