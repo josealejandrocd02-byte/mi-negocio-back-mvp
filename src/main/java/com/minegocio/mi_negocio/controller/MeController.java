@@ -18,7 +18,7 @@ import com.minegocio.mi_negocio.repository.StoreUserRepository;
 import com.minegocio.mi_negocio.repository.UserRepository;
 
 /**
- * Datos del usuario con sesion iniciada. El id sale del token, no del front.
+ * Datos del usuario con sesion iniciada. El id sale del token, no del front. joel guerrero
  */
 @RestController
 @RequestMapping("/api/me")
