@@ -8,92 +8,104 @@ import java.util.List;
 import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.minegocio.mi_negocio.emus.SaleStatus;
+
 @Entity
 @Table(name = "sales")
 public class Sale {
- @Id @GeneratedValue(strategy = GenerationType.UUID)
- private UUID id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
- @ManyToOne(fetch = FetchType.LAZY, optional = false)
- @JoinColumn(name = "store_id", nullable = false)
- private Store store;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "store_id", nullable = false)
+    private Store store;
 
- @ManyToOne(fetch = FetchType.LAZY)
- @JoinColumn(name = "order_id")
- private CustomerOrder order;          // null = venta directa en mostrador
+    // CAMBIO: Ahora es obligatoria (nullable = false, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "order_id", nullable = false)
+    private CustomerOrder order;
 
- @ManyToOne(fetch = FetchType.LAZY, optional = false)
- @JoinColumn(name = "sold_by", nullable = false)
- private User soldBy;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "sold_by", nullable = false)
+    private User soldBy;
 
- @Column(nullable = false, precision = 12, scale = 2)
- private BigDecimal total;
+    @Column(nullable = false, precision = 12, scale = 2)
+    private BigDecimal total;
 
- @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true)
- private List<SaleItem> items = new ArrayList<>();
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private SaleStatus status = SaleStatus.PENDING;
 
- @CreationTimestamp
- @Column(name = "created_at", nullable = false, updatable = false)
- private Instant createdAt;
- 
- 
+    @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SaleItem> items = new ArrayList<>();
 
- public UUID getId() {
-	return id;
- }
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
 
- public void setId(UUID id) {
-	this.id = id;
- }
+    // Getters y Setters
+    public UUID getId() {
+        return id;
+    }
 
- public Store getStore() {
-	return store;
- }
+    public void setId(UUID id) {
+        this.id = id;
+    }
 
- public void setStore(Store store) {
-	this.store = store;
- }
+    public Store getStore() {
+        return store;
+    }
 
- public CustomerOrder getOrder() {
-	return order;
- }
+    public void setStore(Store store) {
+        this.store = store;
+    }
 
- public void setOrder(CustomerOrder order) {
-	this.order = order;
- }
+    public CustomerOrder getOrder() {
+        return order;
+    }
 
- public User getSoldBy() {
-	return soldBy;
- }
+    public void setOrder(CustomerOrder order) {
+        this.order = order;
+    }
 
- public void setSoldBy(User soldBy) {
-	this.soldBy = soldBy;
- }
+    public User getSoldBy() {
+        return soldBy;
+    }
 
- public BigDecimal getTotal() {
-	return total;
- }
+    public void setSoldBy(User soldBy) {
+        this.soldBy = soldBy;
+    }
 
- public void setTotal(BigDecimal total) {
-	this.total = total;
- }
+    public BigDecimal getTotal() {
+        return total;
+    }
 
- public List<SaleItem> getItems() {
-	return items;
- }
+    public void setTotal(BigDecimal total) {
+        this.total = total;
+    }
 
- public void setItems(List<SaleItem> items) {
-	this.items = items;
- }
+    public SaleStatus getStatus() {
+        return status;
+    }
 
- public Instant getCreatedAt() {
-	return createdAt;
- }
+    public void setStatus(SaleStatus status) {
+        this.status = status;
+    }
 
- public void setCreatedAt(Instant createdAt) {
-	this.createdAt = createdAt;
- }
- 
- 
- 
+    public List<SaleItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<SaleItem> items) {
+        this.items = items;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
 }

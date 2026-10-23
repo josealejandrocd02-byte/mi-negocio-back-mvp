@@ -14,6 +14,7 @@ public class SaleCreateRequest {
     private UUID storeId;
 
     // Opcional: pedido del que proviene la venta (null = venta directa en mostrador)
+    @NotNull(message = "El ID de la orden es obligatorio") // <-- Añadir esto
     private UUID orderId;
 
     @NotEmpty(message = "La venta debe tener al menos un producto")

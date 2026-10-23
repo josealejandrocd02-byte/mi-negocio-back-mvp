@@ -115,7 +115,6 @@ public class CloudinaryService {
     // VALIDACION
     // =====================================================
 
-    // Devuelve los bytes ya validados para no leer el archivo dos veces
     private byte[] validateAndRead(MultipartFile file, long maxSize) {
         if (file == null || file.isEmpty()) {
             throw badRequest("Imagen vacia");
@@ -146,13 +145,11 @@ public class CloudinaryService {
             throw badRequest("No se pudo leer el archivo");
         }
 
-        // El contenido real debe ser una imagen (no basta con el nombre ni el content-type)
         String type = detectType(bytes);
         if (type == null) {
             throw badRequest("El archivo no es una imagen valida");
         }
 
-        // Java no lee WEBP de serie: para ese formato Cloudinary limita el tamano con la transformacion
         if (!"webp".equals(type)) {
             validateDimensions(bytes);
         }
@@ -160,7 +157,6 @@ public class CloudinaryService {
         return bytes;
     }
 
-    // Firma ("magic bytes") del archivo
     private String detectType(byte[] b) {
         if (b.length > 3
                 && (b[0] & 0xFF) == 0xFF && (b[1] & 0xFF) == 0xD8 && (b[2] & 0xFF) == 0xFF) {
@@ -178,7 +174,6 @@ public class CloudinaryService {
         return null;
     }
 
-    // Lee solo la cabecera (no decodifica la imagen completa en memoria)
     private void validateDimensions(byte[] bytes) {
         try (ImageInputStream in = ImageIO.createImageInputStream(new ByteArrayInputStream(bytes))) {
             Iterator<ImageReader> readers = ImageIO.getImageReaders(in);
