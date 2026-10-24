@@ -20,7 +20,9 @@ import com.minegocio.mi_negocio.service.StoreFotoConfigService;
 /**
  * Logo de la sucursal y fotos de sus productos.
  * Todas las subidas son multipart/form-data con el campo "file".
- * SecurityConfig exige token; el servicio comprueba SUPER_ADMIN o STORE_ADMIN de {storeId}.
+ * SecurityConfig exige token; el servicio comprueba:
+ * - logo: SUPER_ADMIN o STORE_ADMIN de {storeId};
+ * - foto de producto: solo STORE_ADMIN de {storeId} (el catalogo no lo gestiona SUPER_ADMIN).
  */
 @RestController
 @RequestMapping("/api/stores/{storeId}/foto-config")
@@ -54,14 +56,13 @@ public class StoreFotoConfigController {
     public PhotoResponse uploadProductPhoto(@PathVariable UUID storeId, @PathVariable UUID productId,
                                             @AuthenticationPrincipal JwtPrincipal principal,
                                             @RequestParam("file") MultipartFile file) {
-        return service.uploadProductPhoto(storeId, productId, principal.getUserId(),
-                principal.isSuperAdmin(), file);
+        return service.uploadProductPhoto(storeId, productId, principal.getUserId(), file);
     }
 
     @DeleteMapping("/products/{productId}/photo")
     public ResponseEntity<Void> deleteProductPhoto(@PathVariable UUID storeId, @PathVariable UUID productId,
                                                    @AuthenticationPrincipal JwtPrincipal principal) {
-        service.deleteProductPhoto(storeId, productId, principal.getUserId(), principal.isSuperAdmin());
+        service.deleteProductPhoto(storeId, productId, principal.getUserId());
         return ResponseEntity.noContent().build();
     }
 }

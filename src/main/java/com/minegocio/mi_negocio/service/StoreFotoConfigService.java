@@ -26,7 +26,8 @@ import com.minegocio.mi_negocio.repository.UserRepository;
 
 /**
  * Fotos de una sucursal: logo de la tienda y foto de cada producto (Cloudinary).
- * Pueden gestionarlas el SUPER_ADMIN o un STORE_ADMIN activo de esa sucursal.
+ * - Logo: puede gestionarlo el SUPER_ADMIN o un STORE_ADMIN activo de esa sucursal.
+ * - Foto de producto: solo un STORE_ADMIN activo de esa sucursal (el catalogo no lo gestiona SUPER_ADMIN).
  * El id de quien llama sale siempre del token JWT.
  */
 @Service
@@ -90,9 +91,9 @@ public class StoreFotoConfigService {
     // =====================================================
 
     @Transactional
-    public PhotoResponse uploadProductPhoto(UUID storeId, UUID productId, UUID callerId,
-                                            boolean superAdmin, MultipartFile file) {
-        requireManager(storeId, callerId, superAdmin);
+    public PhotoResponse uploadProductPhoto(UUID storeId, UUID productId, UUID callerId, MultipartFile file) {
+        // El catalogo no lo gestiona SUPER_ADMIN: solo STORE_ADMIN de la sucursal.
+        requireManager(storeId, callerId, false);
         Product product = findProduct(storeId, productId);
 
         CloudinaryImage uploaded = cloudinaryService.uploadProductImage(storeId, file);
@@ -112,8 +113,9 @@ public class StoreFotoConfigService {
     }
 
     @Transactional
-    public void deleteProductPhoto(UUID storeId, UUID productId, UUID callerId, boolean superAdmin) {
-        requireManager(storeId, callerId, superAdmin);
+    public void deleteProductPhoto(UUID storeId, UUID productId, UUID callerId) {
+        // El catalogo no lo gestiona SUPER_ADMIN: solo STORE_ADMIN de la sucursal.
+        requireManager(storeId, callerId, false);
         Product product = findProduct(storeId, productId);
 
         String oldPublicId = product.getImagePublicId();

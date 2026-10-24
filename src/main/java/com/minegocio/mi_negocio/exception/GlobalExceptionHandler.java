@@ -3,6 +3,7 @@ package com.minegocio.mi_negocio.exception;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -20,6 +21,15 @@ public class GlobalExceptionHandler {
         body.put("status", ex.getStatusCode().value());
         body.put("message", ex.getReason() != null ? ex.getReason() : "Error");
         return ResponseEntity.status(ex.getStatusCode()).body(body);
+    }
+
+    // Violacion de una restriccion de la BD (p. ej. indice unico lower(name)) en concurrencia
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, Object>> handleDataIntegrity(DataIntegrityViolationException ex) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("status", HttpStatus.CONFLICT.value());
+        body.put("message", "Ya existe un registro con ese nombre en esta sucursal");
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
 
     // Errores de @Valid en los DTOs
