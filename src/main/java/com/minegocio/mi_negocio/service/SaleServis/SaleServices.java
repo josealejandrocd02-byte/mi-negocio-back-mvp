@@ -38,12 +38,6 @@ import com.minegocio.mi_negocio.repository.StoreRepository;
 import com.minegocio.mi_negocio.repository.StoreUserRepository;
 import com.minegocio.mi_negocio.repository.UserRepository;
 
-/**
- * Gestion de ventas.
- * Todas las operaciones validan que el usuario del token sea dueño de la
- * sucursal, miembro activo de ella, o SUPER_ADMIN.
- * Los precios y el total SIEMPRE se calculan con el catalogo de la BD.
- */
 @Service
 public class SaleServices implements SaleServi {
 
@@ -82,7 +76,6 @@ public class SaleServices implements SaleServi {
             throw conflict("La sucursal '" + store.getName() + "' esta cerrada");
         }
 
-        // CAMBIO: Validar estrictamente que se envíe el ID de la orden
         if (req.getOrderId() == null) {
             throw conflict("Es obligatorio asociar una orden para poder registrar una venta");
         }
@@ -95,7 +88,7 @@ public class SaleServices implements SaleServi {
 
         Sale sale = new Sale();
         sale.setStore(store);
-        sale.setOrder(order); // Asignación obligatoria
+        sale.setOrder(order);
         sale.setSoldBy(soldBy);
         sale.setStatus(SaleStatus.PENDING);
 
@@ -118,7 +111,7 @@ public class SaleServices implements SaleServi {
         }
 
         applyItems(sale, sale.getStore(), req.getItems());
-        saleRepository.flush();
+        saleRepository.save(sale); // Persistencia explícita asegurada
         return toResponse(sale);
     }
 
@@ -131,6 +124,8 @@ public class SaleServices implements SaleServi {
     public SaleResponse changeStatus(UUID id, SaleStatusRequest req, UUID requesterId, boolean superAdmin) {
         Sale sale = findAccessibleSale(id, requesterId, superAdmin);
         updateStatus(sale, req.getStatus());
+
+        saleRepository.save(sale); // Persistencia explícita asegurada
         return toResponse(sale);
     }
 
@@ -144,6 +139,7 @@ public class SaleServices implements SaleServi {
         }
 
         sale.setStatus(SaleStatus.CANCELLED);
+        saleRepository.save(sale); // Persistencia explícita asegurada
         return toResponse(sale);
     }
 
@@ -180,7 +176,7 @@ public class SaleServices implements SaleServi {
         Store store = findStore(storeId);
         assertStoreAccess(store, requesterId, superAdmin);
 
-        return saleRepository.findByStoreWithItems(storeId).stream()
+        return saleRepository.findByStore_IdOrderByCreatedAtDesc(storeId).stream()
                 .map(this::toResponse)
                 .toList();
     }
@@ -265,7 +261,7 @@ public class SaleServices implements SaleServi {
     }
 
     private Sale findAccessibleSale(UUID id, UUID requesterId, boolean superAdmin) {
-        Sale sale = saleRepository.findByIdWithItems(id)
+        Sale sale = saleRepository.findById(id)
                 .orElseThrow(() -> notFound("Venta no encontrada"));
         assertStoreAccess(sale.getStore(), requesterId, superAdmin);
         return sale;

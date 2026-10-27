@@ -19,12 +19,14 @@ public class Category {
  @Column(nullable = false, length = 100)
  private String name;
 
- @Column(name = "is_active", nullable = false)
- private boolean active = true;
+    @Column(name = "is_active", nullable = false, columnDefinition = "boolean default true")
+    private boolean active = true;
 
- @CreationTimestamp
- @Column(name = "created_at", nullable = false, updatable = false)
- private Instant createdAt;
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "timestamp default CURRENT_TIMESTAMP")
+    private Instant createdAt;
+
+
 
  public Instant getCreatedAt() {
 	return createdAt;

@@ -8,92 +8,107 @@ import java.util.List;
 import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.minegocio.mi_negocio.emus.SaleStatus;
+
 @Entity
 @Table(name = "sales")
 public class Sale {
- @Id @GeneratedValue(strategy = GenerationType.UUID)
- private UUID id;
 
- @ManyToOne(fetch = FetchType.LAZY, optional = false)
- @JoinColumn(name = "store_id", nullable = false)
- private Store store;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
- @ManyToOne(fetch = FetchType.LAZY)
- @JoinColumn(name = "order_id")
- private CustomerOrder order;          // null = venta directa en mostrador
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "store_id", nullable = false)
+    private Store store;
 
- @ManyToOne(fetch = FetchType.LAZY, optional = false)
- @JoinColumn(name = "sold_by", nullable = false)
- private User soldBy;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    private CustomerOrder order; // null = venta directa en mostrador
 
- @Column(nullable = false, precision = 12, scale = 2)
- private BigDecimal total;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "sold_by", nullable = false)
+    private User soldBy;
 
- @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true)
- private List<SaleItem> items = new ArrayList<>();
+    @Column(nullable = false, precision = 12, scale = 2)
+    private BigDecimal total;
 
- @CreationTimestamp
- @Column(name = "created_at", nullable = false, updatable = false)
- private Instant createdAt;
- 
- 
+    // ==========================================
+    // CAMBIO: Se agregó el campo status
+    // ==========================================
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private SaleStatus status = SaleStatus.PENDING;
 
- public UUID getId() {
-	return id;
- }
+    @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SaleItem> items = new ArrayList<>();
 
- public void setId(UUID id) {
-	this.id = id;
- }
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
 
- public Store getStore() {
-	return store;
- }
+    // Getters y Setters
+    public UUID getId() {
+        return id;
+    }
 
- public void setStore(Store store) {
-	this.store = store;
- }
+    public void setId(UUID id) {
+        this.id = id;
+    }
 
- public CustomerOrder getOrder() {
-	return order;
- }
+    public Store getStore() {
+        return store;
+    }
 
- public void setOrder(CustomerOrder order) {
-	this.order = order;
- }
+    public void setStore(Store store) {
+        this.store = store;
+    }
 
- public User getSoldBy() {
-	return soldBy;
- }
+    public CustomerOrder getOrder() {
+        return order;
+    }
 
- public void setSoldBy(User soldBy) {
-	this.soldBy = soldBy;
- }
+    public void setOrder(CustomerOrder order) {
+        this.order = order;
+    }
 
- public BigDecimal getTotal() {
-	return total;
- }
+    public User getSoldBy() {
+        return soldBy;
+    }
 
- public void setTotal(BigDecimal total) {
-	this.total = total;
- }
+    public void setSoldBy(User soldBy) {
+        this.soldBy = soldBy;
+    }
 
- public List<SaleItem> getItems() {
-	return items;
- }
+    public BigDecimal getTotal() {
+        return total;
+    }
 
- public void setItems(List<SaleItem> items) {
-	this.items = items;
- }
+    public void setTotal(BigDecimal total) {
+        this.total = total;
+    }
 
- public Instant getCreatedAt() {
-	return createdAt;
- }
+    public SaleStatus getStatus() {
+        return status;
+    }
 
- public void setCreatedAt(Instant createdAt) {
-	this.createdAt = createdAt;
- }
- 
- 
- 
+    public void setStatus(SaleStatus status) {
+        this.status = status;
+    }
+
+    public List<SaleItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<SaleItem> items) {
+        this.items = items;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
 }
