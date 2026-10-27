@@ -15,29 +15,6 @@ public interface SaleRepository extends JpaRepository<Sale, UUID> {
  List<Sale> findByStore_IdAndCreatedAtBetweenOrderByCreatedAtDesc(UUID storeId, Instant from, Instant to);
  Optional<Sale> findByIdAndStore_Id(UUID id, UUID storeId);
 
- // Venta con items, producto, sucursal y vendedor cargados en una sola consulta
- @Query("""
-        select distinct s from Sale s
-        join fetch s.store
-        join fetch s.soldBy
-        left join fetch s.items i
-        left join fetch i.product
-        where s.id = :id
-        """)
- Optional<Sale> findByIdWithItems(@Param("id") UUID id);
-
- // Listado de ventas de una sucursal con items y producto en una sola consulta
- @Query("""
-        select distinct s from Sale s
-        join fetch s.store st
-        join fetch s.soldBy
-        left join fetch s.items i
-        left join fetch i.product
-        where st.id = :storeId
-        order by s.createdAt desc
-        """)
- List<Sale> findByStoreWithItems(@Param("storeId") UUID storeId);
-
  // Reporte consolidado de un dueño con varias sucursales
  @Query("""
         select s.store.name as storeName, count(s) as salesCount, sum(s.total) as total

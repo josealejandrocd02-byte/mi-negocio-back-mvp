@@ -13,6 +13,8 @@ import com.minegocio.mi_negocio.entity.Category;
 
 public interface CategoryRepository extends JpaRepository<Category, UUID> {
  List<Category> findByStore_IdOrderByNameAsc(UUID storeId);
+ List<Category> findByStore_IdAndActiveTrueOrderByNameAsc(UUID storeId);
  Optional<Category> findByIdAndStore_Id(UUID id, UUID storeId);
  boolean existsByStore_IdAndNameIgnoreCase(UUID storeId, String name);
+ boolean existsByStore_IdAndNameIgnoreCaseAndIdNot(UUID storeId, String name, UUID id);
 }

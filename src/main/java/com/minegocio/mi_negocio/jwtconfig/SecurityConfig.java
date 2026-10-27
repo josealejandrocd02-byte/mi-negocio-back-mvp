@@ -59,6 +59,8 @@ public class SecurityConfig {
 
                 // públicos
                 .requestMatchers("/api/auth/**", "/api/public/**").permitAll()
+                // el error dispatch no debe convertirse en 401
+                .requestMatchers("/error").permitAll()
 
                 // solo el dueño del SaaS
                 .requestMatchers("/api/admin/**").hasAuthority("ROLE_SUPER_ADMIN")
@@ -88,8 +90,7 @@ public class SecurityConfig {
         config.setAllowedOrigins(List.of(
                 "http://localhost:8081",   // Expo / React Native
                 "http://localhost:8080",   // dev
-                "http://localhost:3000",   // front web dev
-                "http://192.168.*.*:*" 
+                "http://localhost:3000"    // front web dev
         ));
 
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));

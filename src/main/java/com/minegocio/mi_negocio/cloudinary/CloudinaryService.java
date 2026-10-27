@@ -82,11 +82,9 @@ public class CloudinaryService {
                     "No se pudo subir la imagen. Intenta de nuevo");
         }
     }
-
     // =====================================================
     // BORRADO
     // =====================================================
-
     public void deleteImage(String publicId) {
         if (publicId == null || publicId.isBlank()) {
             return;
