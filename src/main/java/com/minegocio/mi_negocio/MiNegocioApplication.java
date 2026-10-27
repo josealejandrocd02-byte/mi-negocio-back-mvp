@@ -68,24 +68,27 @@ CREATE TABLE categories (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     store_id UUID NOT NULL REFERENCES stores(id),
     name VARCHAR(100) NOT NULL,
-    UNIQUE (store_id, name),
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     UNIQUE (id, store_id)
 );
+CREATE UNIQUE INDEX ux_categories_store_name ON categories(store_id, lower(name));
 
--- 5. PRODUCTOS (por sucursal, con su propio stock)
+-- 5. PRODUCTOS (por sucursal; SIN control de stock, RF-21)
 CREATE TABLE products (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     store_id UUID NOT NULL REFERENCES stores(id),
     category_id UUID,
     name VARCHAR(150) NOT NULL,
-    price NUMERIC(12,2) NOT NULL CHECK (price >= 0),
-    stock_quantity INTEGER NOT NULL DEFAULT 0 CHECK (stock_quantity >= 0),
+    price NUMERIC(12,2) NOT NULL CHECK (price > 0),
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     UNIQUE (id, store_id),
     FOREIGN KEY (category_id, store_id) REFERENCES categories(id, store_id)
 );
 CREATE INDEX idx_products_store ON products(store_id);
+CREATE INDEX idx_products_store_category ON products(store_id, category_id);
+CREATE UNIQUE INDEX ux_products_store_name ON products(store_id, lower(name));
 
 -- 6. PEDIDOS (por sucursal)
 CREATE TABLE orders (
@@ -175,7 +178,7 @@ CREATE INDEX idx_sale_items_sale ON sale_items(sale_id);
 -- Pedido entregado -> venta:
 --   UPDATE orders SET status = 'DELIVERED' WHERE id = :order AND store_id = :store;
 --   INSERT INTO sales (store_id, order_id, sold_by, total) ...;
---   copiar order_items a sale_items y descontar products.stock_quantity.
+--   copiar order_items a sale_items (no hay stock que descontar: RF-21).
 
 
 
@@ -226,8 +229,28 @@ LEFT JOIN stores s ON s.id = su.store_id
 ORDER BY u.email;
 
 
-ALTER TABLE stores   ADD COLUMN logo_url TEXT, ADD COLUMN logo_public_id VARCHAR(255);
-ALTER TABLE products ADD COLUMN image_url TEXT, ADD COLUMN image_public_id VARCHAR(255);
+ALTER TABLE stores   ADD COLUMN IF NOT EXISTS logo_url TEXT, ADD COLUMN IF NOT EXISTS logo_public_id VARCHAR(255);
+ALTER TABLE products ADD COLUMN IF NOT EXISTS image_url TEXT, ADD COLUMN IF NOT EXISTS image_public_id VARCHAR(255);
+
+-- =====================================================================
+-- MIGRACION v3 (RF-19 / RF-21): categorias con estado activo y sin stock
+-- Ejecutar sobre bases de datos ya creadas con el script anterior.
+-- =====================================================================
+ALTER TABLE categories ADD COLUMN IF NOT EXISTS is_active BOOLEAN NOT NULL DEFAULT TRUE;
+ALTER TABLE products   DROP COLUMN IF EXISTS stock_quantity;
+
+-- =====================================================================
+-- MIGRACION v4: precio > 0, unicidad case-insensitive de nombres,
+-- indice de productos por categoria y created_at en categorias.
+-- Ejecutar sobre bases de datos ya creadas con los scripts anteriores.
+-- =====================================================================
+ALTER TABLE products DROP CONSTRAINT IF EXISTS products_price_check;
+ALTER TABLE products ADD CONSTRAINT products_price_check CHECK (price > 0);
+ALTER TABLE categories ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT now();
+CREATE INDEX IF NOT EXISTS idx_products_store_category ON products(store_id, category_id);
+ALTER TABLE categories DROP CONSTRAINT IF EXISTS categories_store_id_name_key;
+CREATE UNIQUE INDEX IF NOT EXISTS ux_categories_store_name ON categories(store_id, lower(name));
+CREATE UNIQUE INDEX IF NOT EXISTS ux_products_store_name   ON products(store_id, lower(name));
  * 
  * */
  

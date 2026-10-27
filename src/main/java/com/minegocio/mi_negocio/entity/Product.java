@@ -26,9 +26,6 @@ public class Product {
  @Column(nullable = false, precision = 12, scale = 2)
  private BigDecimal price;
 
- @Column(name = "stock_quantity", nullable = false)
- private int stockQuantity;
-
  @Column(name = "is_active", nullable = false)
  private boolean active = true;
 
@@ -37,10 +34,10 @@ public class Product {
  private Instant createdAt;
  
  @Column(name = "image_url")
- private String imageUrl;
+ private String imageUrl; //es la que damos
 
  @Column(name = "image_public_id")
- private String imagePublicId;
+ private String imagePublicId; //devuleve cloudinary
  
  
  
@@ -99,14 +96,6 @@ public class Product {
 
  public void setPrice(BigDecimal price) {
 	this.price = price;
- }
-
- public int getStockQuantity() {
-	return stockQuantity;
- }
-
- public void setStockQuantity(int stockQuantity) {
-	this.stockQuantity = stockQuantity;
  }
 
  public boolean isActive() {
