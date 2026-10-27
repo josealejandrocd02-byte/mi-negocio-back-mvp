@@ -33,4 +33,3 @@ build/
 .vscode/
 
 ### Custom - Configuración Privada ###
-src/main/resources/application.properties
