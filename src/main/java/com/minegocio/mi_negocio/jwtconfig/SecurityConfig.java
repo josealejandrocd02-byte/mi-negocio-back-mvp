@@ -89,7 +89,7 @@ public class SecurityConfig {
                 "http://localhost:8081",   // Expo / React Native
                 "http://localhost:8080",   // dev
                 "http://localhost:3000",   // front web dev
-                "http://192.168.*.*:*" 
+                "http://192.168.*.*:*"
         ));
 
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
