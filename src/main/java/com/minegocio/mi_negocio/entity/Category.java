@@ -26,8 +26,6 @@ public class Category {
     @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "timestamp default CURRENT_TIMESTAMP")
     private Instant createdAt;
 
-
-
  public Instant getCreatedAt() {
 	return createdAt;
  }

@@ -33,6 +33,13 @@ public interface StoreRepository extends JpaRepository<Store, UUID> {
 
 	// ---- nombre unico por dueno (sin distinguir mayusculas) ----
 	boolean existsByOwnerUser_IdAndNameIgnoreCase(UUID ownerId, String name);
+	
+	@Query("""
+		    SELECT su.store.id
+		    FROM StoreUser su
+		    WHERE su.user.id = :userId
+		""")
+		Optional<UUID> findStoreIdByUserId(@Param("userId") UUID userId);
 
 	boolean existsByOwnerUser_IdAndNameIgnoreCaseAndIdNot(UUID ownerId, String name, UUID id);
 }

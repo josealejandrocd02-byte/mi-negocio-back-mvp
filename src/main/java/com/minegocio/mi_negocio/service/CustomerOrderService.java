@@ -209,10 +209,7 @@ public class CustomerOrderService {
                 .orElse(null);
 
         int totalQuantity = req.getQuantity() + (existing != null ? existing.getQuantity() : 0);
-        if (product.getStockQuantity() < totalQuantity) {
-            throw conflict("Stock insuficiente para '" + product.getName()
-                    + "' (disponible: " + product.getStockQuantity() + ")");
-        }
+  
 
         if (existing != null) {
             existing.setQuantity(totalQuantity);
@@ -245,10 +242,6 @@ public class CustomerOrderService {
                 .orElseThrow(() -> notFound("Item no encontrado en este pedido"));
 
         Product product = findActiveProduct(storeId, req.getProductId());
-        if (product.getStockQuantity() < req.getQuantity()) {
-            throw conflict("Stock insuficiente para '" + product.getName()
-                    + "' (disponible: " + product.getStockQuantity() + ")");
-        }
 
         item.setProduct(product);
         item.setQuantity(req.getQuantity());
@@ -297,11 +290,7 @@ public class CustomerOrderService {
             Product product = findActiveProduct(storeId, entry.getKey());
             int qty = entry.getValue();
 
-            if (product.getStockQuantity() < qty) {
-                throw conflict("Stock insuficiente para '" + product.getName()
-                        + "' (disponible: " + product.getStockQuantity() + ")");
-            }
-
+   
             OrderItem item = new OrderItem();
             item.setOrder(order);
             item.setStoreId(storeId);
@@ -347,14 +336,8 @@ public class CustomerOrderService {
             if (!product.isActive()) {
                 throw conflict("El producto '" + product.getName() + "' ya no esta activo");
             }
-            if (product.getStockQuantity() < orderItem.getQuantity()) {
-                throw conflict("Stock insuficiente para entregar '" + product.getName()
-                        + "' (disponible: " + product.getStockQuantity()
-                        + ", requerido: " + orderItem.getQuantity() + ")");
-            }
 
-            // Descontar stock del producto
-            product.setStockQuantity(product.getStockQuantity() - orderItem.getQuantity());
+
 
             // Copiar order_item a sale_item
             SaleItem saleItem = new SaleItem();

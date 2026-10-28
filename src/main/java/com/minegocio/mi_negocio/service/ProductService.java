@@ -18,6 +18,8 @@ import com.minegocio.mi_negocio.entity.Product;
 import com.minegocio.mi_negocio.entity.Store;
 import com.minegocio.mi_negocio.repository.CategoryRepository;
 import com.minegocio.mi_negocio.repository.ProductRepository;
+import com.minegocio.mi_negocio.repository.StoreRepository;
+import com.minegocio.mi_negocio.repository.StoreUserRepository;
 import com.minegocio.mi_negocio.util.CatalogMapper;
 
 /**
@@ -31,18 +33,42 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final StoreRepository storeUserRepository;
+    
     private final CatalogAccess access;
 
     public ProductService(ProductRepository productRepository,
                           CategoryRepository categoryRepository,
+                          StoreRepository storeUserRepository,
                           CatalogAccess access) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
+        this.storeUserRepository = storeUserRepository;
         this.access = access;
     }
 
     @Transactional(readOnly = true)
     public List<ProductResponse> list(UUID storeId, UUID callerId, UUID categoryId, String q) {
+        access.requireMember(storeId, callerId);
+        boolean manager = access.isManager(storeId, callerId);
+
+        List<Product> products = load(storeId, categoryId, manager);
+        String search = (q == null || q.isBlank()) ? null : q.trim().toLowerCase(Locale.ROOT);
+
+        return products.stream()
+                .filter(p -> search == null || p.getName().toLowerCase(Locale.ROOT).contains(search))
+                .map(CatalogMapper::toResponse)
+                .toList();
+    }
+    
+    @Transactional(readOnly = true)
+    public List<ProductResponse> listEmployee( UUID callerId, UUID categoryId, String q) {
+        UUID storeId = storeUserRepository.findStoreIdByUserId(callerId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "El usuario no pertenece a ninguna tienda"
+                        )
+                );
         access.requireMember(storeId, callerId);
         boolean manager = access.isManager(storeId, callerId);
 

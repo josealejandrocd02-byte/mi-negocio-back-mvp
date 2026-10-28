@@ -20,6 +20,8 @@ import com.minegocio.mi_negocio.dtos.catalog.ProductCreateRequest;
 import com.minegocio.mi_negocio.dtos.catalog.ProductResponse;
 import com.minegocio.mi_negocio.dtos.catalog.ProductUpdateRequest;
 import com.minegocio.mi_negocio.dtos.user.ActiveRequest;
+import com.minegocio.mi_negocio.entity.Product;
+import com.minegocio.mi_negocio.entity.Store;
 import com.minegocio.mi_negocio.jwtconfig.JwtPrincipal;
 import com.minegocio.mi_negocio.service.ProductService;
 
@@ -48,6 +50,16 @@ public class ProductController {
                                       @RequestParam(required = false) UUID categoryId,
                                       @RequestParam(required = false) String q) {
         return service.list(storeId, principal.getUserId(), categoryId, q);
+    }
+
+    
+    @GetMapping("/employyelist")
+    public List<ProductResponse> listEmployee(
+                                      @AuthenticationPrincipal JwtPrincipal principal,
+                                      @RequestParam(required = false) UUID categoryId,
+                                      @RequestParam(required = false) String q) {
+    	
+        return service.listEmployee(principal.getUserId(), categoryId, q);
     }
 
     @GetMapping("/{productId}")
